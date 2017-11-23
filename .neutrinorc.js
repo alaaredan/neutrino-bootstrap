@@ -1,6 +1,14 @@
 module.exports = {
   use: [
     ['neutrino-preset-airbnb-base'], // first the linting!
-    ['neutrino-preset-web'], // then the compilation
-  ],
+    ['neutrino-middleware-styles-loader'], // then the compilation
+    [
+    'neutrino-preset-web',
+    {
+      html: {
+        title: 'My App',
+      }
+    }
+    ],
+  ]
 };
