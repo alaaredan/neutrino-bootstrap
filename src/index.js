@@ -1,59 +1,58 @@
 import $ from 'jquery';
 import 'bootstrap/js/src';
 import './styles.scss';
-import navbar from './templates/navbar.html';
-import carousel from './templates/carousel.html';
-
-/**
- * Carousel
- */
-
-
+import navbarTemplate from './templates/navbar.html';
+import mkCarousel from './carousel';
+import productCardTemmplate from './templates/product-card.html';
 /**
  * Products
  */
-const pictures = [
-  'kitten-2.jpg',
-  'kitten-little.jpg',
-  'kitten.jpg',
-  'koala.jpg',
-  'pinguin.jpg',
-  'sloth.jpg',
-];
-
-function mkCard(img) {
-  return `
-<div class="card">
-  <img class="card-img-top" src="static/${img}" alt="Card image cap">
-  <div class="card-body">
-    <h4 class="card-title">Card title</h4>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
-</div>
-`;
+function mkProductCard(product) {
+  const $card = $(productCardTemmplate);
+  $card.find('.card-title').text(product.name);
+  $card.find('.card-text').text(`Price: ${product.price}€`);
+  return $card;
 }
 
-const grid = `
-<div class="container-fluid">
-  <div class="row shop-products-row">
-    <div class="col-12 col-lg-4">${mkCard(pictures[0])}</div>
-    <div class="col-12 col-lg-4">${mkCard(pictures[1])}</div>
-    <div class="col-12 col-lg-4">${mkCard(pictures[2])}</div>
-  </div>
-  <div class="row shop-products-row">
-    <div class="col-12 col-lg-4">${mkCard(pictures[3])}</div>
-    <div class="col-12 col-lg-4">${mkCard(pictures[4])}</div>
-    <div class="col-12 col-lg-4">${mkCard(pictures[5])}</div>
-  </div>
-</div>
-`;
+function mkProductGrid(products) {
+  const $containerEl = $('<div class="container-fluid"></div>');
 
+  const $rowEl = $('<div class="row"></div>');
+  $containerEl.append($rowEl);
+  products.forEach((products) => {
+    const $colEl = $('<div class="col-12 col-md-4"></div>');
+    $colEl.append(mkProductCard(products));
+    $rowEl.append($colEl);
+  });
+  return $containerEl;
+}
+
+function updateNavbar(categories) {
+  const $navbarNav = $('.navbar-nav').empty();
+  categories.forEach((category) => {
+    $navbarNav.append(`<li class="nav-item">
+      <a class="nav-link" href="#">${category.name}</a>
+    </li>`);
+  });
+}
 
 $(() => {
-  $('#root')
-    .append(navbar)
-    .append(carousel)
-    .append(grid);
-  $('.carousel').carousel();
+  $('#root').append(navbarTemplate);
+
+  $.ajax('./static/categories.json')
+    .done((categories) => {
+      const $carousel = mkCarousel(categories);
+      $('#root').append($carousel);
+      // because the HTML of the carousel
+      // is added after the page loads,
+      // we need to initialize the
+      // Bootstrap carousel ourselves
+      $carousel.carousel();
+      updateNavbar(categories);
+    });
+  $.ajax('./static/products.json')
+    .done((products) => {
+      const $productGrid = mkProductGrid(products);
+      $('#root').append($productGrid);
+    });
 });
