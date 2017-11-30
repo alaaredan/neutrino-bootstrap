@@ -19,9 +19,9 @@ function mkProductGrid(products) {
 
   const $rowEl = $('<div class="row"></div>');
   $containerEl.append($rowEl);
-  products.forEach((products) => {
+  products.forEach((product) => {
     const $colEl = $('<div class="col-12 col-md-4"></div>');
-    $colEl.append(mkProductCard(products));
+    $colEl.append(mkProductCard(product));
     $rowEl.append($colEl);
   });
   return $containerEl;
